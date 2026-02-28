@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  mysql-primary:
+    image: mysql:8.0
+    container_name: mysql-primary
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./primary/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - mysql-repl-network
+
+  mysql-replica:
+    image: mysql:8.0
+    container_name: mysql-replica
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3310:3306"
+    volumes:
+      - ./replica/my.cnf:/etc/mysql/conf.d/my.cnf
+    depends_on:
+      - mysql-primary
+    networks:
+      - mysql-repl-network
+
+networks:
+  mysql-repl-network:
+    driver: bridge
